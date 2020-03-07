@@ -8,3 +8,5 @@ allocator.o: allocator.cpp allocator.h
 	$(CC) -c allocator.cpp
 clean:
 	rm -rf *.o run_allocator
+test:
+	valgrind ./run_allocator
