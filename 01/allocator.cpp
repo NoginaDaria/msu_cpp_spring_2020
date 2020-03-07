@@ -1,7 +1,7 @@
 #include "allocator.h"
 #include <iostream>
 
-Allocator::Allocator(size_t maxSize)
+Allocator::Allocator(size_t maxSize): maxSize(maxSize)
 {
   begin_ptr = new char[maxSize];
   char* current_ptr = begin_ptr;

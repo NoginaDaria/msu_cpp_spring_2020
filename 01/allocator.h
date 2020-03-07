@@ -1,7 +1,7 @@
 #include <iostream>
 
 class Allocator {
-  std::size_t maxSize;
+  size_t maxSize;
   char* begin_ptr;
   char* current_ptr;
 public:
