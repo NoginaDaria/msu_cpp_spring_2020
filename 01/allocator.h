@@ -1,4 +1,5 @@
 #include <iostream>
+#pragma once
 
 class Allocator {
   size_t maxSize;
