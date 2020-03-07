@@ -3,13 +3,13 @@
 
 Allocator::Allocator(size_t maxSize)
 {
-  begin_ptr = new char [maxSize];
-  current_ptr = begin_ptr;
+  begin_ptr = new char[maxSize];
+  char* current_ptr = begin_ptr;
 }
 
 char* Allocator::alloc(size_t size)
 {
-  if ((current_ptr + size) <= (begin_ptr + maxSize))
+  if (current_ptr + size <= begin_ptr + maxSize)
   {
     char* res_ptr = current_ptr;
     current_ptr += size;
