@@ -1,12 +1,13 @@
-#include "allocaror.h"
+#include "allocator.h"
+#include <iostream>
 
-Allocator::Allocator(std::size_t maxSize)
+Allocator::Allocator(size_t maxSize)
 {
   begin_ptr = new char [maxSize];
   current_ptr = begin_ptr;
 }
 
-char* Allocator::alloc(std::size_t size)
+char* Allocator::alloc(size_t size)
 {
   if ((current_ptr + size) <= (begin_ptr + maxSize))
   {

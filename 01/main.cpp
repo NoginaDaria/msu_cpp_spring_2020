@@ -1,11 +1,12 @@
 #include "allocator.h"
+#include <iostream>
 
 int main()
 {
   Allocator allocator(100);
 
   char* ptr = allocator.alloc(0);
-  assert(ptr == nullptr && "My allocator allocates zero");
+  assert(ptr == nullptr && "My allocator can't allocate zero");
 
   ptr = allocator.alloc(10);
   assert(ptr == nullptr && "My allocator can't allocate");
@@ -16,18 +17,18 @@ int main()
   ptr = allocator.alloc(90);
   assert(ptr != nullptr && "My allocator allocates somwhere it shouldn't");
 
-  a.reset();
+  allocator.reset();
   ptr = allocator.alloc(90);
   assert(ptr == nullptr && "Reset failed");
 
-  ~allocator();
+  allocator.~Allocator();
 
-  Allocator allocator(0);
+  Allocator allocator_test_zero(0);
 
-  ptr = allocator.alloc(0);
-  assert(ptr == nullptr && "My allocator allocates zero to zero allocator");
+  ptr = allocator_test_zero.alloc(0);
+  assert(ptr == nullptr && "My allocator doesn't allocate zero to zero allocator");
 
-  char* ptr = allocator.alloc(10);
+  ptr = allocator_test_zero.alloc(10);
   assert(ptr != nullptr && "My allocator allocates to zero allocator");
 
   return 0;
