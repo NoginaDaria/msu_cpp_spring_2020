@@ -9,10 +9,8 @@ Allocator::Allocator(size_t maxSize): maxSize(maxSize)
 
 char* Allocator::alloc(size_t size)
 {
-  std::cout << "maxSize" << maxSize << " " << size << std::endl;
   if (current_ptr + size <= begin_ptr + maxSize)
   {
-    std::cout << "HERE I AM" << std::endl;
     char* res_ptr = current_ptr;
     current_ptr += size;
     return res_ptr;
