@@ -1,35 +1,21 @@
 #include "parser.h"
 
-void (*number_callback)(const char* token);
-void (*string_callback)(const char* token);
-void (*start_callback)();
-void (*end_callback)();
-
-bool number_callback_bool = false;
-bool string_callback_bool = false;
-bool start_callback_bool = false;
-bool end_callback_bool = false;
-
 void register_number_callback(OnToken callback){
-  OnToken number_callback = callback;
-  number_callback_bool = true;
+  number_callback = callback;
 }
 void register_string_callback(OnToken callback){
-  OnToken string_callback = callback;
-  string_callback_bool = true;
+  string_callback = callback;
 }
 void register_start_callback(OnPosition callback){
-  OnPosition start_callback = callback;
-  start_callback_bool = true;
+  start_callback = callback;
 }
 void register_end_callback(OnPosition callback){
-  OnPosition end_callback = callback;
-  end_callback_bool = true;
+  end_callback = callback;
 }
 
 void parse(const char* text)
 {
-  if(start_callback_bool) start_callback();
+  if(start_callback != nullptr) start_callback();
 
   char* text_copy = new char[strlen(text) + 1];
   strcpy(text_copy, text);
@@ -37,12 +23,12 @@ void parse(const char* text)
 
   while (pch != NULL)
   {
-    if ((isdigit(pch[0]))&(number_callback_bool)) number_callback(pch);
-    else if(string_callback_bool) string_callback(pch);
+    if ((isdigit(pch[0]))&(number_callback != nullptr)) number_callback(pch);
+    else if(string_callback != nullptr) string_callback(pch);
 
     pch = strtok (NULL, " \n\t");
     std::cout << pch << '\n';
   }
-  if(end_callback_bool) end_callback();
+  if(end_callback != nullptr) end_callback();
   free(text_copy);
 }
