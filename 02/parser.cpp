@@ -33,7 +33,7 @@ void parse(const char* text)
 
   char* text_copy = new char[strlen(text) + 1];
   strcpy(text_copy, text);
-  char* pch = strtok (text_copy, " \n\t");
+  const char* pch = strtok (text_copy, " \n\t");
 
   while (pch != NULL)
   {
