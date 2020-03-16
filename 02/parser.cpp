@@ -1,5 +1,10 @@
 #include "parser.h"
 
+OnToken number_callback = nullptr;
+OnToken string_callback = nullptr;
+OnPosition start_callback = nullptr;
+OnPosition end_callback = nullptr;
+
 void register_number_callback(OnToken callback){
   number_callback = callback;
 }
