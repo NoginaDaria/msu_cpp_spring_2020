@@ -27,7 +27,6 @@ void parse(const char* text)
     else if(string_callback != nullptr) string_callback(pch);
 
     pch = strtok (NULL, " \n\t");
-    std::cout << pch << '\n';
   }
   if(end_callback != nullptr) end_callback();
   free(text_copy);
