@@ -29,7 +29,7 @@ void register_end_callback(OnPosition callback){
 
 void parse(const char* text)
 {
-  if(start_callback_bool) (*start_callback)();
+  if(start_callback_bool) start_callback();
 
   char* text_copy = new char[strlen(text) + 1];
   strcpy(text_copy, text);
@@ -37,12 +37,12 @@ void parse(const char* text)
 
   while (pch != NULL)
   {
-    if ((isdigit(pch[0]))&(number_callback_bool)) (*number_callback)(pch);
-    else if(string_callback_bool) (*string_callback)(pch);
+    if ((isdigit(pch[0]))&(number_callback_bool)) number_callback(pch);
+    else if(string_callback_bool) string_callback(pch);
 
     pch = strtok (NULL, " \n\t");
     std::cout << pch << '\n';
   }
-  if(end_callback_bool) (*end_callback)();
+  if(end_callback_bool) end_callback();
   free(text_copy);
 }
