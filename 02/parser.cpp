@@ -7,6 +7,7 @@ OnPosition end_callback = nullptr;
 
 std::string delimiter = " \n\t";
 std::string pch;
+bool nonstop = true;
 size_t last;
 size_t next;
 
@@ -29,16 +30,16 @@ void parse(std::string text)
 
   last = 0;
   next = 0;
-  while ((next = text.find_first_of(delimiter, last)) != std::string::npos)
-  {
-    pch = text.substr(last, next-last);
-    if ((isdigit(pch[0]))&(number_callback != nullptr)) number_callback(stoi(pch));
+  do{
+    if((next = text.find_first_of(delimiter, last)) != std::string::npos){
+      pch = text.substr(last, next-last);
+    }else{
+      pch = text.substr(last);
+      nonstop = false;
+    }
+    if ((isdigit(pch[0]))&&(number_callback != nullptr)) number_callback(stoi(pch));
     else if(string_callback != nullptr) string_callback(pch);
     last = next + 1;
-  }
-  pch = text.substr(last);
-  if ((isdigit(pch[0]))&(number_callback != nullptr)) number_callback(stoi(pch));
-  else if(string_callback != nullptr) string_callback(pch);
-
+  } while (nonstop);
   if(end_callback != nullptr) end_callback();
 }

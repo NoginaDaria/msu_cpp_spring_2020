@@ -1,4 +1,4 @@
-CC=g++
+CC=clang++
 all: test
 test: main.o parser.o
 	$(CC) -o test main.o parser.o --std=c++14 -O2
