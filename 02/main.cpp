@@ -1,10 +1,9 @@
 #include "parser.h"
-#include <iostream>
 
-void onNumberFound(const char * n){
+void onNumberFound(int n){
   std::cout << n << '\n';
 }
-void onStringFound(const char * n){
+void onStringFound(std::string n){
   std::cout << "I found a string " << n << '\n';
 }
 void Start(){

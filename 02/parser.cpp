@@ -1,11 +1,16 @@
 #include "parser.h"
 
-OnToken number_callback = nullptr;
+OnTokenNum number_callback = nullptr;
 OnToken string_callback = nullptr;
 OnPosition start_callback = nullptr;
 OnPosition end_callback = nullptr;
 
-void register_number_callback(OnToken callback){
+std::string delimiter = " \n\t";
+std::string pch;
+size_t last;
+size_t next;
+
+void register_number_callback(OnTokenNum callback){
   number_callback = callback;
 }
 void register_string_callback(OnToken callback){
@@ -18,21 +23,22 @@ void register_end_callback(OnPosition callback){
   end_callback = callback;
 }
 
-void parse(const char* text)
+void parse(std::string text)
 {
   if(start_callback != nullptr) start_callback();
 
-  char* text_copy = new char[strlen(text) + 1];
-  strcpy(text_copy, text);
-  const char* pch = strtok (text_copy, " \n\t");
-
-  while (pch != NULL)
+  last = 0;
+  next = 0;
+  while ((next = text.find_first_of(delimiter, last)) != std::string::npos)
   {
-    if ((isdigit(pch[0]))&(number_callback != nullptr)) number_callback(pch);
+    pch = text.substr(last, next-last);
+    if ((isdigit(pch[0]))&(number_callback != nullptr)) number_callback(stoi(pch));
     else if(string_callback != nullptr) string_callback(pch);
-
-    pch = strtok (NULL, " \n\t");
+    last = next + 1;
   }
+  pch = text.substr(last);
+  if ((isdigit(pch[0]))&(number_callback != nullptr)) number_callback(stoi(pch));
+  else if(string_callback != nullptr) string_callback(pch);
+
   if(end_callback != nullptr) end_callback();
-  free(text_copy);
 }

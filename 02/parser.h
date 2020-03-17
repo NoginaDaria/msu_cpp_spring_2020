@@ -1,15 +1,14 @@
-#include <ctype.h>
-#include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+#include <iostream>
 
 #pragma once
 
-using OnToken = void (*)(const char* token);
+using OnToken = void (*)(std::string token);
+using OnTokenNum = void (*)(int token);
 using OnPosition = void (*)();
 
-void parse(const char* text);
-void register_number_callback(OnToken callback);
+void parse(std::string text);
+void register_number_callback(OnTokenNum callback);
 void register_string_callback(OnToken callback);
 void register_start_callback(OnPosition callback);
 void register_end_callback(OnPosition callback);
