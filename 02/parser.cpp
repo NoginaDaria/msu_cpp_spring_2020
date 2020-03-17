@@ -24,7 +24,7 @@ void register_end_callback(OnPosition callback){
   end_callback = callback;
 }
 
-void parse(std::string text)
+void parse(std::string &text)
 {
   if(start_callback != nullptr) start_callback();
 
