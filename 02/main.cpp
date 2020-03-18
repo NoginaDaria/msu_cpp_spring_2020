@@ -20,7 +20,7 @@ int main()
   register_start_callback(Start);
   register_end_callback(End);
 
-  std::string input_string = "123 abc 4567";
+  const std::string input_string = "123 abc 4567";
   parse(input_string);
 
   return 0;
