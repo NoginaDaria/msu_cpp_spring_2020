@@ -7,6 +7,8 @@ class Matrix {
   size_t cols;
   int * matrix;
 
+public:
+
   class Proxy {
     int * torow;
     size_t ncols;
@@ -17,7 +19,6 @@ class Matrix {
     ~Proxy();
   };
 
-public:
   Matrix(size_t rows, size_t cols);
   size_t getRows();
   size_t getColumns();

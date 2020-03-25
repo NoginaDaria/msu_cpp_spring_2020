@@ -29,6 +29,16 @@ int& Matrix::Proxy::operator[](size_t j){
   return this->torow[j];
 }
 
+const Matrix::Proxy Matrix::operator[](size_t j) const{
+  assert(this->cols < j && "Index Error: index out of range");
+  return Matrix::Proxy(*this, j)
+}
+
+Matrix::Proxy Matrix::operator[](size_t j){
+  assert(this->cols < j && "Index Error: index out of range");
+  return Matrix::Proxy(*this, j)
+}
+
 Matrix::Proxy::~Proxy() {}
 
 bool Matrix::operator==(const Matrix& i) const{
