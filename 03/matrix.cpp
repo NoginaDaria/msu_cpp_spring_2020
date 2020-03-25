@@ -14,29 +14,29 @@ size_t Matrix::getColumns(){
   return this->cols;
 }
 
-Matrix::Proxy::Proxy(Matrix * m, size_t j){
+Matrix::Proxy::Proxy(const Matrix * m, size_t j){
   this->ncols = m->cols;
   this->torow = m->matrix + j * this->ncols;
 }
 
 const int& Matrix::Proxy::operator[](size_t j) const{
-  assert(this->ncols < j && "Index Error: index out of range");
+  assert(this->ncols > j && "Index Error: index out of range");
   return this->torow[j];
 }
 
 int& Matrix::Proxy::operator[](size_t j){
-  assert(this->ncols < j && "Index Error: index out of range");
+  assert(this->ncols > j && "Index Error: index out of range");
   return this->torow[j];
 }
 
 const Matrix::Proxy Matrix::operator[](size_t j) const{
-  assert(this->cols < j && "Index Error: index out of range");
-  return Matrix::Proxy(*this, j)
+  assert(this->cols > j && "Index Error: index out of range");
+  return Matrix::Proxy(this, j);
 }
 
 Matrix::Proxy Matrix::operator[](size_t j){
-  assert(this->cols < j && "Index Error: index out of range");
-  return Matrix::Proxy(*this, j)
+  assert(this->cols > j && "Index Error: index out of range");
+  return Matrix::Proxy(this, j);
 }
 
 Matrix::Proxy::~Proxy() {}

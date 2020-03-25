@@ -13,7 +13,7 @@ public:
     int * torow;
     size_t ncols;
   public:
-    Proxy(Matrix * m, size_t j);
+    Proxy(const Matrix * m, size_t j);
     const int& operator[](size_t j) const;
     int& operator[](size_t j);
     ~Proxy();
