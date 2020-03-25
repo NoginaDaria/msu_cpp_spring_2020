@@ -20,12 +20,12 @@ Matrix::Proxy::Proxy(Matrix * m, size_t j){
 }
 
 const int& Matrix::Proxy::operator[](size_t j) const{
-  assert(this->ncols > j && "Index Error: index out of range");
+  assert(this->ncols < j && "Index Error: index out of range");
   return this->torow[j];
 }
 
 int& Matrix::Proxy::operator[](size_t j){
-  assert(this->ncols > j && "Index Error: index out of range");
+  assert(this->ncols < j && "Index Error: index out of range");
   return this->torow[j];
 }
 
