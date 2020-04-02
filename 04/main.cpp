@@ -38,9 +38,9 @@ int main()
 
     y = { 0, true, 0 };
 
-    auto s6 = std::stringstream("100 false 42");
-    Deserializer d6(s6);
-    equal(d6.load(y), Error::NoError);
+    auto s2 = std::stringstream("100 false 42");
+    Deserializer d2(s2);
+    equal(d2.load(y), Error::NoError);
 
     equal(y.a, 100);
     equal(y.b, false);
