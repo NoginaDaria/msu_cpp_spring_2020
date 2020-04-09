@@ -3,6 +3,7 @@
 BigInt::BigInt() : size(1), is_negative(false)
 {
   data = new char[data_size];
+  data[0] = "0";
 }
 
 BigInt::BigInt(char *a, size_t s, bool neg) : size(s), is_negative(neg), data(a) {}
@@ -32,7 +33,8 @@ BigInt::BigInt(const BigInt &&n) : size(n.size), is_negative(n.is_negative), dat
   n.size = 0;
 }
 
-std::ostream& operator<<(std::ostream& out, const BigInt& n) {
+std::ostream& operator<<(std::ostream& out, const BigInt& n)
+{
     if (!n.is_negative) out << '-';
     for (size_t i = 0; i < n.size; ++i) {
         out << n.data[i];
@@ -40,7 +42,7 @@ std::ostream& operator<<(std::ostream& out, const BigInt& n) {
     return out;
 }
 
-BigInt& BigInt::operator=(const BigInt &n)
+BigInt BigInt::operator=(const BigInt &n)
 {
   if (this == &n)
     return *this;
@@ -52,7 +54,7 @@ BigInt& BigInt::operator=(const BigInt &n)
   return *this;
 }
 
-BigInt& BigInt::operator=(const BigInt &&n)
+BigInt BigInt::operator=(const BigInt &&n)
 {
   if (this == &n)
     return *this;
@@ -176,12 +178,13 @@ bool BigInt::operator==(const BigInt &n) const
     return true;
 }
 
-bool BigInt::operator==(const BigInt &n) const
+bool BigInt::operator!=(const BigInt &n) const
 {
   return !(*this == n);
 }
 
-bool BigInt::operator<(const BigInt &n) const {
+bool BigInt::operator<(const BigInt &n) const
+{
     if (sign != n.sign) return sign < n.sign;
     if (size != n.size) return size < n.size;
     for (int i = 0; i < size; ++i) {
@@ -194,14 +197,41 @@ bool BigInt::operator<(const BigInt &n) const {
     return false;
 }
 
-bool BigInt::operator<=(const BigInt &n) const {
+bool BigInt::operator<=(const BigInt &n) const
+{
     return (*this < n) || (*this == n);
 }
 
-bool BigInt::operator>=(const BigInt &n) const {
+bool BigInt::operator>=(const BigInt &n) const
+{
     return !(*this < n);
 }
 
-bool BigInt::operator>(const BigInt &n) const {
+bool BigInt::operator>(const BigInt &n) const
+``{
     return !(*this < n) && (*this != n);
+}
+
+bool BigInt::operator==(long long n) const {
+    return *this == BigInt(n);
+}
+
+bool BigInt::operator!=(long long n) const {
+    return *this != BigInt(n);
+}
+
+bool BigInt::operator<(long long n) const {
+    return *this < BigInt(n);
+}
+
+bool BigInt::operator<=(long long n) const {
+    return *this <= BigInt(n);
+}
+
+bool BigInt::operator>(long long n) const {
+    return *this > BigInt(n);
+}
+
+bool BigInt::operator>=(long long n) const {
+    return *this >= BigInt(n);
 }
