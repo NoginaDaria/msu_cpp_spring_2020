@@ -15,12 +15,12 @@ public:
   BigInt();
   BigInt(long long n);
   BigInt(const BigInt& n);
-  BigInt(const BigInt&& n);
+  BigInt(BigInt&& n);
 
   friend std::ostream& operator<<(std::ostream& out, const BigInt& n);
 
   BigInt& operator=(const BigInt& n);
-  BigInt& operator=(const BigInt&& n);
+  BigInt& operator=(BigInt&& n);
 
   ~BigInt();
 
