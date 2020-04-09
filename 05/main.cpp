@@ -3,11 +3,11 @@
 
 int main()
 {
-    BigInt x = -5;
-    BigInt y = -4;
-    //equal(x < y, false);
+    BigInt x = 5;
+    BigInt y = 4;
+    equal(x < y, false);
 
-    std::cout << x + y << "\n";
+    std::cout << x - y << "\n";
 
     std::cout << "done\n";
 

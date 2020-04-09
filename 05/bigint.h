@@ -33,11 +33,4 @@ public:
   bool operator<=(const BigInt& n) const;
   bool operator>(const BigInt& n) const;
   bool operator>=(const BigInt& n) const;
-
-  bool operator==(long long n) const;
-  bool operator!=(long long n) const;
-  bool operator<(long long n) const;
-  bool operator<=(long long n) const;
-  bool operator>(long long n) const;
-  bool operator>=(long long n) const;
 };
