@@ -2,22 +2,24 @@
 
 BigInt::BigInt() : size(1), is_negative(false)
 {
-  data = new char[data_size];
+  data = new char[20];
   data[0] = '0';
 }
 
-BigInt::BigInt(char *a, size_t s, bool neg) : size(s), is_negative(neg), data(a) {}
+BigInt::BigInt(char *a, size_t s, bool neg) : size(s), is_negative(neg)
+{
+  data = new char[20];
+  std::copy(a, a + s, data);
+}
 
 BigInt::BigInt(long long n)
 {
-  std::cout << n << "\n";
   bool is_negative = n < 0;
   n = is_negative ? -n: n;
-  std::cout << n << " changed \n";
-  data = new char[data_size];
+  data = new char[20];
   size = 0;
   while (n > 0){
-    data[size] = n % 10;
+    data[size] = n % 10 + '0';
     n /= 10;
     size++;
   }
@@ -37,9 +39,9 @@ BigInt::BigInt(BigInt &&n) : size(n.size), is_negative(n.is_negative), data(n.da
 
 std::ostream& operator<<(std::ostream& out, const BigInt& n)
 {
-    if (!n.is_negative) out << '-';
-    for (size_t i = 0; i < n.size; ++i) {
-        out << n.data[i];
+    if (n.is_negative) out << '-';
+    for (int i = 0; i < n.size; i++) {
+      out << n.data[i];
     }
     return out;
 }
@@ -52,6 +54,7 @@ BigInt& BigInt::operator=(const BigInt &n)
   delete [] data;
   data = ptr;
   size = n.size;
+  is_negative = n.is_negative;
   std::copy(n.data, n.data + size, data);
   return *this;
 }
@@ -63,6 +66,7 @@ BigInt& BigInt::operator=(BigInt &&n)
   delete [] data;
   data = n.data;
   size = n.size;
+  is_negative = n.is_negative;
   n.data = nullptr;
   n.size = 0;
   return *this;
@@ -83,29 +87,24 @@ BigInt BigInt::operator-() const
 BigInt BigInt::plus(const BigInt &n1, const BigInt &n2) const
 {
   char* res = new char[n2.size + 1];
-  char left = 0;
-  size_t current = n2.size+1;
-  for (int i=n1.size, j=n2.size; i >= 0 & j >= 0; --i, --j)
+  int left = 0;
+  size_t current = n2.size-1;
+  std::cout << n1.size << ": n1, " << n2.size << ": n2\n";
+  for (int i=0, j=0; i < n1.size & j < n2.size; i++, j++)
   {
-    res[current] = (n1.data[i] + n2.data[j] + left) % 10;
-    left = (n1.data[i] + n2.data[j] + left) / 10;
+    res[current] =  (n1.data[i] + n2.data[j] - 2 *'0' + left) % 10 + '0';
+    left = (n1.data[i] + n2.data[j] - 2 *'0' + left) / 10;
     current--;
   }
-  for (int i=n2.size-n1.size; i >= 0; --i)
+  for (int i=n1.size; i < n2.size; i++)
   {
-    res[current] = (n2.data[i] + left) % 10;
-    left = (n2.data[i] + left) / 10;
+    res[current] = (n2.data[i] - '0' + left) % 10 + '0';
+    left = (n2.data[i] - '0'+ left) / 10;
     current--;
   }
-  if (left > 0) res[current] = left;
-  if (left == 0){
-    for (int i=0; i < n2.size+1; ++i)
-    {
-      res[i] = res[i+1];
-    }
-  }
+  if (left > 0) res[current] = left + '0';
   size_t res_size = left > 0 ? n2.size + 1 : n2.size;
-  return BigInt(res, res_size, false);
+  return BigInt(res, n2.size - current, false);
 }
 // n2 >= n1 and both are positive
 BigInt BigInt::minus(const BigInt &n1, const BigInt &n2) const
@@ -146,9 +145,11 @@ BigInt BigInt::minus(const BigInt &n1, const BigInt &n2) const
 BigInt BigInt::operator+(const BigInt &n) const
 {
   BigInt res;
+  std::cout << is_negative << " " << n.is_negative << "\n";
   if (!is_negative && !n.is_negative){
-    res = *this >= n ? BigInt::plus(*this,n) : BigInt::plus(n,*this);
+    res = *this >= n ? BigInt::plus(n, *this) : BigInt::plus(*this,n);
   } else if (is_negative && n.is_negative){
+    std::cout << "hi\n";
     res = *this <= n ? -BigInt::plus(*this,n) : -BigInt::plus(n,*this);
   } else {
     if (is_negative) res = -*this >= n ? -BigInt::minus(*this, n) : BigInt::minus(n, *this);
@@ -169,6 +170,8 @@ BigInt BigInt::operator-(const BigInt &n) const
     if (is_negative) res = -*this >= n ? -BigInt::minus(*this, n) : -BigInt::plus(n, *this);
     if (!is_negative) *this >= -n ? BigInt::plus(*this,n) : BigInt::plus(n,*this);
   }
+  for (int i = 0; i < res.size; i++)
+        std::cout << res.data[i] << " ";
   return res;
 }
 

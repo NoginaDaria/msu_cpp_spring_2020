@@ -7,7 +7,6 @@ class BigInt
   size_t size;
   char* data;
 
-  size_t data_size = 20;
   BigInt(char *a, size_t s, bool neg);
   BigInt plus(const BigInt& n1, const BigInt& n2) const;
   BigInt minus(const BigInt& n1, const BigInt& n2) const;
