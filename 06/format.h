@@ -5,7 +5,6 @@
 
 void process(std::vector<std::string>& strings) {}
 
-
 template <class T, class... Args>
 void process(std::vector<std::string>& given, const T& val, const Args&... args)
 {
