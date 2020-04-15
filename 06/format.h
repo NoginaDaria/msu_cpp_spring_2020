@@ -5,13 +5,6 @@
 
 void process(std::vector<std::string>& strings) {}
 
-template <class T>
-void process(std::vector<std::string>& given, const T& val)
-{
-    std::stringstream stream;
-    stream << val;
-    given.push_back(stream.str());
-}
 
 template <class T, class... Args>
 void process(std::vector<std::string>& given, const T& val, const Args&... args)
