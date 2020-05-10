@@ -1,7 +1,7 @@
 template <class T>
 struct Allocator
 {
-  T* alloc(size_t n) { return new T[n * sizeof(T)]; }
+  T* alloc(size_t n) { return static_cast<T*>(operator new(n * sizeof(T))); }
   void dealloc(T* ptr) { delete ptr; }
   void kill(T* ptr) { ptr->~T(); }
   template <typename... Args>
@@ -100,14 +100,27 @@ public:
     }
     N = n;
   }
-  void push_back(T&& n)
+
+  void push_back(const T& n)
   {
-    if (N + 1 > cap)
+    if (N  > cap)
     {
       size_t to_reserve = cap > 0 ? cap * 2 : 4;
       reserve(to_reserve);
     }
     allocator.make(data_+N, n);
+    ++N;
+  }
+
+
+  void push_back(T&& n)
+  {
+    if (N +1 > cap)
+    {
+      size_t to_reserve = cap > 0 ? cap * 2 : 4;
+      reserve(to_reserve);
+    }
+    allocator.make(data_+N, std::move(n));
     ++N;
   }
 
@@ -120,7 +133,7 @@ public:
 
   void clear()
   {
-    for (size_t i=0; i<N; ++i) allocator.kill(data_+i);
+    for (size_t i=0; i<N; ++i) (data_ + i) -> ~T();
     N = 0;
     cap = 0;
   }
