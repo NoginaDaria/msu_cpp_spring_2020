@@ -10,7 +10,6 @@ BigInt::BigInt() : size(1), is_negative(false)
   data[0] = '0';
 }
 
-
 BigInt::BigInt(char *a, size_t s, bool neg) : size(s), is_negative(neg)
 {
   data = new char[25];
@@ -27,15 +26,11 @@ BigInt::BigInt(long long n)
     data[size] = '0';
     size = 1;
   }
-  //std::cout << "\n" << n << " number:\n";
   while (n > 0){
     data[size] = n % 10 + '0';
-    //std::cout << data[size];
     n /= 10;
     size++;
   }
-  //std::cout << "\n" ;
-  //std::cout << data[0] << data[1] << "\n";
 }
 
 BigInt::BigInt(const BigInt &n) : size(n.size), is_negative(n.is_negative)
@@ -53,9 +48,7 @@ BigInt::BigInt(BigInt &&n) : size(n.size), is_negative(n.is_negative), data(n.da
 std::ostream& operator<<(std::ostream& out, const BigInt& n)
 {
     if (n.is_negative) out << '-';
-    for (int i = n.size; i >=0; i--) {
-      out << n.data[i];
-    }
+    for (int i = n.size-1; i >=0; i--) out << char(n.data[i]);
     return out;
 }
 
@@ -101,7 +94,7 @@ BigInt BigInt::plus(const BigInt &n1, const BigInt &n2) const
 {
   char* res = new char[n2.size + 1];
   int left = 0;
-  size_t current = n2.size-1;
+  size_t current = n2.size;
   for (int i=0, j=0; i < n1.size & j < n2.size; i++, j++)
   {
     res[current] =  (n1.data[i] + n2.data[j] - 2 *'0' + left) % 10 + '0';
@@ -115,8 +108,9 @@ BigInt BigInt::plus(const BigInt &n1, const BigInt &n2) const
     current--;
   }
   if (left > 0) res[current] = left + '0';
-  size_t res_size = left > 0 ? n2.size + 1 : n2.size;
+  size_t res_size = left >= 0 ? n2.size + 1 : n2.size;
   std::reverse(res, res+res_size);
+  if (left == 0) res_size -= 1;
   return BigInt(res, res_size, false);
 }
 // n2 >= n1 and both are positive
@@ -149,11 +143,10 @@ BigInt BigInt::minus(const BigInt &n1, const BigInt &n2) const
     if (begin_pos == n2.size) break;
   }
   if (begin_pos != 0){
-    for (int i=0; i < n2.size; ++i)
-    {
-      res[i] = res[i+begin_pos];
-    }
+    for (int i=0; i < n2.size; ++i) res[i] = res[i+begin_pos];
   }
+  std::reverse(res, res+n2.size-begin_pos);
+  //std::cout << res <<"\n";
   return BigInt(res, n2.size-begin_pos, false);
 }
 
@@ -166,26 +159,34 @@ BigInt BigInt::operator+(const BigInt &n) const
   } else if (is_negative && n.is_negative){
     res = *this <= n ? -BigInt::plus(*this,n) : -BigInt::plus(n,*this);
   } else {
-    if (*this == n) return BigInt(0);
+    //std::cout << "hey\n";
+    if (*this == -n) return BigInt(0);
     if (is_negative) res = -*this >= n ? -BigInt::minus(n, *this) : BigInt::minus(*this, n);
     if (!is_negative) res = *this >= -n ? BigInt::minus(n,*this) : -BigInt::minus(*this, n);
   }
+  //std::cout << res <<  "\n";
   return res;
 }
 
 BigInt BigInt::operator-(const BigInt &n) const
 {
-  bool is_negative = false;
+  //std::cout << *this << " " << n << " " << is_negative << " " << n.is_negative << " " << (*this == n) << "\n";
   if (*this == n) return BigInt(0);
   BigInt res;
   if (!is_negative && !n.is_negative){
+    //std::cout << *this << " " << n << "\n";
+    //std::cout << !is_negative << " " << !n.is_negative << "\n";
     if (*this == n) return BigInt(0);
     res = *this >= n ? BigInt::minus(n, *this) : -BigInt::minus(*this, n);
   } else if (is_negative && n.is_negative){
+    std::cout << "why??\n";
     res = *this <= n ? -BigInt::minus(n, *this) : BigInt::minus(*this, n);
   } else {
-    if (is_negative) res = -*this >= n ? -BigInt::minus(n, *this) : -BigInt::plus(*this, n);
-    if (!is_negative) *this >= -n ? BigInt::plus(n, *this) : BigInt::plus(*this, n);
+    //std::cout<<"hey\n";
+    //std::cout << n << " " << -*this << "\n";
+    //std::cout << BigInt::plus(n, *this) << "\n";
+    if (is_negative) res = -*this > n ? -BigInt::minus(n, *this) : -BigInt::plus(*this, n);
+    if (!is_negative) res = *this >= -n ? BigInt::plus(n, *this) : BigInt::plus(*this, n);
   }
   return res;
 }
@@ -193,7 +194,7 @@ BigInt BigInt::operator-(const BigInt &n) const
 bool BigInt::operator==(const BigInt &n) const
 {
     if (this == &n) return true;
-    if ((is_negative != n.is_negative) && (data[0] == n.data[0]) && (data[0] == 0))
+    if ((is_negative != n.is_negative) && (data[0] == n.data[0]) && (data[0] == '0') && (n.size == 1))
       return true;
     if (is_negative != n.is_negative || size != n.size) return false;
     for (int i = 0; i < size; ++i) {

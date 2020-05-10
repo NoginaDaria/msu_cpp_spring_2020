@@ -85,7 +85,6 @@ int main()
     checkTrue(x >= BigInt(-500));
     checkTrue(BigInt(-200) >= BigInt(-500));
     checkTrue(BigInt(0) == -BigInt(0));
-
     checkEqual(BigInt(10) + BigInt(10), "20");
     checkEqual(BigInt(-10) + BigInt(10), "0");
     checkEqual(BigInt(10) + BigInt(-10), "0");
@@ -104,36 +103,15 @@ int main()
     checkEqual(BigInt(10) - BigInt(11), "-1");
     checkEqual(BigInt(20) - BigInt(19), "1");
 
-    //for (int i = -21; i <= 21; ++i)
-    //{
-    //    for (int j = -21; j <= 21; ++j)
-    //    {
-    //        check(i, j);
-    //    }
-    //}
-
-    const int64_t step = std::numeric_limits<uint32_t>::max() / 99;
-    const int64_t lower = std::numeric_limits<int32_t>::min() + step;
-    const int64_t upper = std::numeric_limits<int32_t>::max() - step;
-
-    //for (int64_t i = lower; i < upper; i += step)
-    //{
-    //    for (int64_t j = -99; j < 99; ++j)
-    //    {
-    //        check(i, j);
-    //    }
-    //}
 
     const BigInt big1 = std::numeric_limits<int64_t>::max();
-    std::cout << "big1 " << std::numeric_limits<int64_t>::max() << "\n";
+    //std::cout << "big1 " << std::numeric_limits<int64_t>::max() << "\n";
     checkEqual(big1, "9223372036854775807");
-
+    //std::cout << "-------WOW------\n";
     const BigInt big2 = big1 + big1;
     checkEqual(big2, "18446744073709551614");
-
     const BigInt big3 = big2 - big1;
     checkEqual(big3, "9223372036854775807");
-
     std::cout << "done\n";
 
     return 0;
