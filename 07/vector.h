@@ -2,7 +2,7 @@ template <class T>
 struct Allocator
 {
   T* alloc(size_t n) { return static_cast<T*>(operator new(n * sizeof(T))); }
-  void dealloc(T* ptr) { delete ptr; }
+  void dealloc(T* ptr) { operator delete(ptr); }
   void kill(T* ptr) { ptr->~T(); }
   template <typename... Args>
   void make(T* ptr, Args&&... args)
@@ -133,8 +133,11 @@ public:
 
   void clear()
   {
-    for (size_t i=0; i<N; ++i) (data_ + i) -> ~T();
-    N = 0;
+    while (N > 0)
+    {
+      allocator.kill(data_ + N);
+      --N;
+    }
     cap = 0;
   }
 
