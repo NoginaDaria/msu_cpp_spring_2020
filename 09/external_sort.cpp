@@ -11,7 +11,7 @@
 typedef int64_t DTYPE;
 
 size_t S = 1024 * 8 * sizeof(DTYPE);
-size_t B = sizeof(DTYPE);
+size_t B = 1024 * sizeof(DTYPE);
 
 using std::vector;
 using std::cout;
