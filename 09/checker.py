@@ -3,9 +3,9 @@ import os
 from subprocess import Popen, PIPE
 from timeit import default_timer as timer
 
-TYPE = np.int32
+TYPE = np.uint64
 MAX_VALUE = 2 ** 31
-MIN_VALUE = - 2 ** 31
+MIN_VALUE = 0
 TEMP_SHUFFLED = "temp_shuffle.bin"
 TEMP_SORTED = "temp_sorted.bin"
 PATH_TO_EXT_SORT = "external_sort.exe"
@@ -60,7 +60,6 @@ def check(array_size,
 
     os.remove(test_file_shuffle)
     os.remove(test_file_sorted)
-
     return np.equal(arr, true_arr).sum() == arr.shape[0]
 
 

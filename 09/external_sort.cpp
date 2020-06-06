@@ -8,10 +8,10 @@
 #define TEMPORARY_FILE_MASK "temporaryXXXXXX"
 #define OPEN_FILES_LIMIT 128
 
-typedef int DTYPE;
+typedef int64_t DTYPE;
 
 size_t S = 1024 * 8 * sizeof(DTYPE);
-size_t B = 1024 * sizeof(DTYPE);
+size_t B = sizeof(DTYPE);
 
 using std::vector;
 using std::cout;
@@ -127,7 +127,7 @@ void TempFile::writeNum(DTYPE num)
     assert((w_num != -1) && "Error while writing num to a file\n");
   }
 
-  if (buf_pos == capacity)  flush();
+  if (buf_pos == capacity) flush();
 
   *(DTYPE*)(buf + buf_pos) = num;
   buf_pos += sizeof(DTYPE);
@@ -239,9 +239,6 @@ vector<std::shared_ptr<TempFile>> merge(vector<std::shared_ptr<TempFile>>& in_fi
     out_file->flush();
     out_file->close();
     out_files.push_back(out_file);
-    /*
-    for (int i = 0; i < merge_files_num; ++i) in_files[i + cur_files_pos]->close();
-    */
     int a_half = merge_files_num/2;
     std::thread t1(close_func, in_files, 0, a_half, cur_files_pos);
     std::thread t2(close_func, in_files, a_half, merge_files_num, cur_files_pos);
@@ -260,8 +257,6 @@ int main(int argNum, char** args)
 
   vector<std::shared_ptr<TempFile>> sort_files;
   vector<std::shared_ptr<TempFile>> new_sort_files;
-
-  std::exception_ptr ex_ptr;
 
   int in_file = open(in_file_name, O_RDONLY);
 
