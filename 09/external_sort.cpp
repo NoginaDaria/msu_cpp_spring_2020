@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include <string.h>
+#include <thread>
 #include <vector>
 #include <iostream>
 #define TEMPORARY_FILE_MASK "temporaryXXXXXX"
@@ -9,7 +10,7 @@
 
 typedef int DTYPE;
 
-size_t S = 1024 * 4 * sizeof(DTYPE);
+size_t S = 1024 * 8 * sizeof(DTYPE);
 size_t B = 1024 * sizeof(DTYPE);
 
 using std::vector;
@@ -68,7 +69,7 @@ TempFile::TempFile(char* _buf, size_t _capacity) : \
 // +
 void TempFile::flush()
 {
-  if (flags && buf_pos != 0)
+  if ((flags & (O_WRONLY | O_RDWR)) && buf_pos != 0)
   {
     ssize_t w_num = write(fd, buf, buf_pos);
     assert((w_num != -1) && "Error occured while flushing a file\n");
@@ -144,16 +145,9 @@ int cmpfunc (const void* _a, const void* _b)
     DTYPE a = *(DTYPE*)_a;
     DTYPE b = *(DTYPE*)_b;
 
-    if (a > b)
-    {
-      return 1;
-    } else if (a < b)
-    {
-      return -1;
-    } else
-    {
-      return 0;
-    }
+    if (a > b) { return 1; }
+    else if (a < b) { return -1; }
+    else { return 0; }
 }
 
 vector<std::shared_ptr<TempFile>> split(int in_file)
@@ -176,6 +170,12 @@ vector<std::shared_ptr<TempFile>> split(int in_file)
   return splitFiles;
 }
 
+void close_func(vector<std::shared_ptr<TempFile>> in_files,\
+                int start, int stop, size_t cur_files_pos)
+{
+  for (int i = start; i < stop; ++i) in_files[i + cur_files_pos]->close();
+}
+
 vector<std::shared_ptr<TempFile>> merge(vector<std::shared_ptr<TempFile>>& in_files)
 {
   char buffer[S];
@@ -195,14 +195,12 @@ vector<std::shared_ptr<TempFile>> merge(vector<std::shared_ptr<TempFile>>& in_fi
     char* cur_buffer_pos = buffer;
     std::shared_ptr<TempFile> out_file = std::make_shared<TempFile>(cur_buffer_pos, B);
     cur_buffer_pos += B;
-
     for(int i = 0; i < merge_files_num; ++i)
     {
       in_files[i + cur_files_pos]->open(O_RDONLY);
       in_files[i + cur_files_pos]->set_buffer(cur_buffer_pos, B);
       cur_buffer_pos += B;
     }
-
     vector<bool> is_ended(merge_files_num);
     std::fill(std::begin(is_ended), end(is_ended), false);
     std::vector<DTYPE> cur_candidates(merge_files_num);
@@ -236,19 +234,23 @@ vector<std::shared_ptr<TempFile>> merge(vector<std::shared_ptr<TempFile>>& in_fi
 
       DTYPE is_read = in_files[min_pos + cur_files_pos]->readNum(&cur_candidates[min_pos]);
 
-      if (! is_read) is_ended[min_pos] = true;
+      if (!is_read) is_ended[min_pos] = true;
     }
     out_file->flush();
     out_file->close();
     out_files.push_back(out_file);
-
+    /*
     for (int i = 0; i < merge_files_num; ++i) in_files[i + cur_files_pos]->close();
-
+    */
+    int a_half = merge_files_num/2;
+    std::thread t1(close_func, in_files, 0, a_half, cur_files_pos);
+    std::thread t2(close_func, in_files, a_half, merge_files_num, cur_files_pos);
+    t1.join();
+    t2.join();
     cur_files_pos += merge_files_num;
   }
   return out_files;
 }
-
 
 int main(int argNum, char** args)
 {
