@@ -8,7 +8,7 @@
 #define TEMPORARY_FILE_MASK "temporaryXXXXXX"
 #define OPEN_FILES_LIMIT 128
 
-typedef int64_t DTYPE;
+typedef uint64_t DTYPE;
 
 size_t S = 1024 * 8 * sizeof(DTYPE);
 size_t B = 1024 * sizeof(DTYPE);
