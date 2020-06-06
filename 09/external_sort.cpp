@@ -17,10 +17,8 @@
 #define WRONG_WRITE_SIZE 667
 #define LOG_LEVEL 10
 
-typedef int INT;
-
-size_t S = 1024 * 4 * sizeof(INT);
-size_t B = 1024 * sizeof(INT);
+size_t S = 1024 * 4 * sizeof(uint64_t);
+size_t B = 1024 * sizeof(uint64_t);
 
 size_t OPEN_FILES_LIMIT = 128;
 
@@ -50,9 +48,9 @@ public:
   TempFile(uint64_t* _buf=0, size_t _capacity=0);
   ~TempFile();
   char* getPath() {return path_name;}
-  void writeNum(INT num);
+  void writeNum(uint64_t num);
   void flush();
-  ssize_t readNum(INT* num);
+  ssize_t readNum(uint64_t* num);
   void writeRange(void* range, size_t range_size);
   bool get_at_end() {return at_end;}
   void set_buffer(uint64_t* _buf, size_t _capacity)
@@ -81,7 +79,7 @@ TempFile::TempFile(uint64_t* _buf, size_t _capacity) : \
   buf(_buf), capacity(_capacity), buf_pos(0), buf_size(0),\
   fd(-1), flags(O_RDWR), at_end(false)
 {
-  assert(((capacity % sizeof(INT)) != 1) && "Error: capacity doesn't match with INT size\n");
+  assert(((capacity % sizeof(uint64_t)) != 1) && "Error: capacity doesn't match with uint64_t size\n");
   strcpy(path_name, TEMPORARY_FILE_MASK);
   fd = mkstemp(path_name);
   assert((fd != -1) && "Error occured while handling a file\n");
@@ -105,13 +103,13 @@ TempFile::~TempFile()
   unlink(path_name);
 }
 
-ssize_t TempFile::readNum(INT* num)
+ssize_t TempFile::readNum(uint64_t* num)
 {
   if (at_end) return 0;
 
   if (! buf)
   {
-    ssize_t r_num = read(fd, (void*)num, sizeof(INT));
+    ssize_t r_num = read(fd, (void*)num, sizeof(uint64_t));
     assert((r_num != -1) && "Error while reading from a file\n");
     if (r_num == 0)
     {
@@ -126,31 +124,31 @@ ssize_t TempFile::readNum(INT* num)
       buf_pos = 0;
       buf_size = read(fd, buf, capacity);
       assert((buf_size != -1) && "Error while reading from a file\n");
-      assert(((buf_size % sizeof(INT)) != 1) && "Error: bufsize doesn't match with INT size\n");
+      assert(((buf_size % sizeof(uint64_t)) != 1) && "Error: bufsize doesn't match with uint64_t size\n");
     }
     if (buf_size == 0)
     {
       at_end = true;
       return 0;
     }
-    *num = *(INT*)(buf + buf_pos);
-    buf_pos += sizeof(INT);
+    *num = *(uint64_t*)(buf + buf_pos);
+    buf_pos += sizeof(uint64_t);
   }
   return 1;
 }
 
-void TempFile::writeNum(INT num)
+void TempFile::writeNum(uint64_t num)
 {
   if (! buf)
   {
-    ssize_t w_num = write(fd, &num, sizeof(INT));
+    ssize_t w_num = write(fd, &num, sizeof(uint64_t));
     assert((w_num != -1) && "Error while writing num to a file\n");
   }
 
   if (buf_pos == capacity)  flush();
 
-  *(INT*)(buf + buf_pos) = num;
-  buf_pos += sizeof(INT);
+  *(uint64_t*)(buf + buf_pos) = num;
+  buf_pos += sizeof(uint64_t);
 }
 
 void TempFile::writeRange(void* range, size_t range_size)
@@ -162,8 +160,8 @@ void TempFile::writeRange(void* range, size_t range_size)
 
 int cmpfunc (const void* _a, const void* _b)
 {
-    INT a = *(INT*)_a;
-    INT b = *(INT*)_b;
+    uint64_t a = *(uint64_t*)_a;
+    uint64_t b = *(uint64_t*)_b;
 
     if (a > b) return 1;
     else if (a < b) return -1;
@@ -180,7 +178,7 @@ vector<shared_ptr<TempFile>> split(int in_file)
   while (in_rnum != 0)
   {
     shared_ptr<TempFile> tf = make_shared<TempFile>(nullptr, 0);
-    qsort(buffer, in_rnum / sizeof(INT), sizeof(INT), cmpfunc);
+    qsort(buffer, in_rnum / sizeof(uint64_t), sizeof(uint64_t), cmpfunc);
     tf->writeRange(buffer, in_rnum);
     tf->close();
     splitFiles.push_back(tf);
@@ -219,12 +217,12 @@ vector<shared_ptr<TempFile>> merge(vector<shared_ptr<TempFile>>& in_files)
 
     vector<bool> is_ended(merge_files_num);
     std::fill(begin(is_ended), end(is_ended), false);
-    std::vector<INT> cur_candidates(merge_files_num);
+    std::vector<uint64_t> cur_candidates(merge_files_num);
 
     //init candidates
     for(int i = 0; i < merge_files_num; ++i)
     {
-      int is_read = in_files[i + cur_files_pos]->readNum(&cur_candidates[i]);
+      uint64_t is_read = in_files[i + cur_files_pos]->readNum(&cur_candidates[i]);
       if (! is_read) is_ended[i] = true;
     }
 
@@ -235,8 +233,8 @@ vector<shared_ptr<TempFile>> merge(vector<shared_ptr<TempFile>>& in_files)
       // all files at end
       if (cur_pos == merge_files_num) break;
 
-      INT min_pos = cur_pos;
-      INT min_value = cur_candidates[cur_pos];
+      int min_pos = cur_pos;
+      int min_value = cur_candidates[cur_pos];
 
       for(int i = cur_pos + 1; i < merge_files_num; ++i)
       {
@@ -248,7 +246,7 @@ vector<shared_ptr<TempFile>> merge(vector<shared_ptr<TempFile>>& in_files)
       }
       out_file->writeNum(min_value);
 
-      int is_read = in_files[min_pos + cur_files_pos]->readNum(&cur_candidates[min_pos]);
+      uint64_t is_read = in_files[min_pos + cur_files_pos]->readNum(&cur_candidates[min_pos]);
 
       if (! is_read) is_ended[min_pos] = true;
     }
