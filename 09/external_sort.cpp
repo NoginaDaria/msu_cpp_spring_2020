@@ -1,37 +1,17 @@
-#include <cstdlib>
-#include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include <errno.h>
-#include <cstddef>
-#include <exception>
 #include <vector>
-#include <iterator>
 #include <iostream>
-#include <memory>
-#define TEMPORARY_FILE_MASK "temporaryXXXXXX"
-#define WRONG_ALIGN_ERROR 666
-#define WRONG_WRITE_SIZE 667
-#define LOG_LEVEL 10
+#define TEMPORARY_FILE_MASK "temporary_mask"
+#define OPEN_FILES_LIMIT 128
 
 size_t S = 1024 * 4 * sizeof(uint64_t);
 size_t B = 1024 * sizeof(uint64_t);
 
-size_t OPEN_FILES_LIMIT = 128;
-
 using std::vector;
-using std::exception;
-using std::array;
-using std::begin;
-using std::end;
 using std::cout;
-using std::endl;
-using std::exception_ptr;
-using std::shared_ptr;
-using std::make_shared;
 
 class TempFile
 {
@@ -168,16 +148,16 @@ int cmpfunc (const void* _a, const void* _b)
     else return 0;
 }
 
-vector<shared_ptr<TempFile>> split(int in_file)
+vector<std::shared_ptr<TempFile>> split(int in_file)
 {
   uint64_t buffer[S];
-  vector<shared_ptr<TempFile>> splitFiles;
+  vector<std::shared_ptr<TempFile>> splitFiles;
 
   ssize_t in_rnum = read(in_file, buffer, S);
   assert((in_rnum != -1) && "Error while reading from the input file\n");
   while (in_rnum != 0)
   {
-    shared_ptr<TempFile> tf = make_shared<TempFile>(nullptr, 0);
+    std::shared_ptr<TempFile> tf = std::make_shared<TempFile>(nullptr, 0);
     qsort(buffer, in_rnum / sizeof(uint64_t), sizeof(uint64_t), cmpfunc);
     tf->writeRange(buffer, in_rnum);
     tf->close();
@@ -188,10 +168,10 @@ vector<shared_ptr<TempFile>> split(int in_file)
   return splitFiles;
 }
 
-vector<shared_ptr<TempFile>> merge(vector<shared_ptr<TempFile>>& in_files)
+vector<std::shared_ptr<TempFile>> merge(vector<std::shared_ptr<TempFile>>& in_files)
 {
   uint64_t buffer[S];
-  vector<shared_ptr<TempFile>> out_files;
+  vector<std::shared_ptr<TempFile>> out_files;
   size_t cur_files_pos = 0;
   size_t merge_files_num;
   size_t file_limit = S / B;
@@ -205,7 +185,7 @@ vector<shared_ptr<TempFile>> merge(vector<shared_ptr<TempFile>>& in_files)
     if (merge_files_num > file_limit) merge_files_num = file_limit;
 
     uint64_t* cur_buffer_pos = buffer;
-    shared_ptr<TempFile> out_file = make_shared<TempFile>(cur_buffer_pos, B);
+    std::shared_ptr<TempFile> out_file = std::make_shared<TempFile>(cur_buffer_pos, B);
     cur_buffer_pos += B;
 
     for(int i = 0; i < merge_files_num; ++i)
@@ -216,7 +196,7 @@ vector<shared_ptr<TempFile>> merge(vector<shared_ptr<TempFile>>& in_files)
     }
 
     vector<bool> is_ended(merge_files_num);
-    std::fill(begin(is_ended), end(is_ended), false);
+    std::fill(std::begin(is_ended), end(is_ended), false);
     std::vector<uint64_t> cur_candidates(merge_files_num);
 
     //init candidates
@@ -268,8 +248,8 @@ int main(int argNum, char** args)
   char const* out_file_name = "out.bin";
   if (argNum == 3) out_file_name = args[2];
 
-  vector<shared_ptr<TempFile>> sort_files;
-  vector<shared_ptr<TempFile>> new_sort_files;
+  vector<std::shared_ptr<TempFile>> sort_files;
+  vector<std::shared_ptr<TempFile>> new_sort_files;
 
   std::exception_ptr ex_ptr;
 
@@ -277,11 +257,11 @@ int main(int argNum, char** args)
 
   cout << "Start splitting file...";
   sort_files = split(in_file);
-  cout << " done" << endl;
+  cout << " done\n";
 
   close(in_file);
 
-  cout << "Merge is started" << endl;
+  cout << "Merge is started\n";
 
   size_t phase_id = 0;
   while (sort_files.size() != 1)
@@ -290,9 +270,9 @@ int main(int argNum, char** args)
     cout << "     Phase " << phase_id << "is started ...";
     new_sort_files = merge(sort_files);
     sort_files = new_sort_files;
-    cout << "   done" << endl;
+    cout << "   done\n";
   }
-  cout << "Merge is finished" << endl;
+  cout << "Merge is finished\n";
 
   unlink(out_file_name);
   int succ_flag = link(sort_files[0]->getPath(), out_file_name);

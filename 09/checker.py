@@ -16,7 +16,7 @@ def print_work_time(func):
         start = timer()
         result = func(*args, **kwargs)
         end = timer()
-        print("Execution take {}".format(end - start))
+        print(f"Execution takes {end - start}")
         return result
     return wrapper
 
@@ -63,7 +63,7 @@ def check(array_size,
 
 
 for size in (2000, 4096, 10000, 16348, 25000, 100000, 1000000, 10000000):
-    print "Testing on {} size".format(size)
+    print(f"Testing on {size} size")
     if check(size):
         print("Pass")
     else:
