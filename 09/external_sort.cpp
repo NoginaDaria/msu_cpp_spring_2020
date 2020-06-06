@@ -65,7 +65,8 @@ public:
   {
     int succ = ::close(fd);
     assert((succ != -1) && "Error occured while closing file\n");
-    void open(int flags);
+  }
+  void open(int flags);
 };
 
 
@@ -280,7 +281,7 @@ int main(int argNum, char** args)
   sort_files = split(in_file);
   cout << " done" << endl;
 
-  ::close(in_file);
+  close(in_file);
 
   cout << "Merge is started" << endl;
 
