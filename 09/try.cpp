@@ -4,10 +4,8 @@
 #include <string.h>
 #include <vector>
 #include <iostream>
-#define TEMPORARY_FILE_MASK "temporaryXXXXXX"
+#define TEMPORARY_FILE_MASK "temporary_mask"
 #define OPEN_FILES_LIMIT 128
-
-typedef int DTYPE;
 
 size_t S = 1024 * 4 * sizeof(DTYPE);
 size_t B = 1024 * sizeof(DTYPE);
@@ -49,13 +47,14 @@ public:
   void open(int flags);
 };
 
+
 void TempFile::open(int flags)
 {
     fd = ::open(path_name, flags);
     flags = flags;
     assert((fd != -1) && "Error occured while opening file\n");
 }
-
+// +
 TempFile::TempFile(char* _buf, size_t _capacity) : \
   buf(_buf), capacity(_capacity), buf_pos(0), buf_size(0),\
   fd(-1), flags(O_RDWR), at_end(false)

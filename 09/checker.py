@@ -16,7 +16,7 @@ def print_work_time(func):
         start = timer()
         result = func(*args, **kwargs)
         end = timer()
-        print(f"Execution takes {end - start}")
+        print("Execution take {}".format(end - start))
         return result
     return wrapper
 
@@ -24,10 +24,11 @@ def print_work_time(func):
 def make_test(array_size,
               min_value=MIN_VALUE,
               max_value=MAX_VALUE,
-              test_file_shuffle=TEMP_SHUFFLED):
+              test_file_shuffle=TEMP_SHUFFLED, sorted_file_name=TEMP_SORTED):
     arr = np.random.randint(min_value, max_value, size=array_size, dtype=TYPE)
     arr.tofile(test_file_shuffle)
-
+    arr_sorted = np.sort(arr)
+    arr.tofile(sorted_file_name)
 
 @print_work_time
 def call_extern_sort(test_file_shuffle=TEMP_SHUFFLED,
@@ -59,11 +60,12 @@ def check(array_size,
 
     os.remove(test_file_shuffle)
     os.remove(test_file_sorted)
+
     return np.equal(arr, true_arr).sum() == arr.shape[0]
 
 
-for size in (2000, 4096, 10000, 16348, 25000, 100000, 1000000, 10000000):
-    print(f"Testing on {size} size")
+for size in (2000, 4096, 10000, 16348, 25000, 100000, 1000000):
+    print("Testing on {} size".format(size))
     if check(size):
         print("Pass")
     else:
